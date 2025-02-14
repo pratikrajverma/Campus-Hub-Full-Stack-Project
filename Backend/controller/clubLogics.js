@@ -29,7 +29,7 @@ async function sendNotification(docs){
 const mailResponse = await transporter.sendMail({
     from:  'From CampusHum official',
     to:  docs.email,
-    html:`<h1>congratulation club created successfully</h1>`,
+    html:`<h1>congratulation club created successfully</h1> <a href="${docs.image}">Click to View Image</a> `,
     subject:`New Club created successfully`
   })
 
@@ -40,24 +40,24 @@ const mailResponse = await transporter.sendMail({
 
 const createClub = async (req, res) => {
   try {
-    const { title, venue } = req.body;
+    const { title, venue, email} = req.body;
 
     const {image} = req.files
 
-    if (!title || !venue || !image) {
+    if (!title || !venue || !image || !email) {
       return res.status(400).json({
         success: false,
         message: "please provide all data for club creation",
       });
     }
 
-    console.log(image)
+    // console.log(image)
 
     const supportedFile = ['.jpeg', '.jpg', '.png']
     const fileExtension = path.extname(image.name)
 
 
-    console.log(checkFileType(supportedFile, fileExtension))
+    // console.log(checkFileType(supportedFile, fileExtension))
 
     if(checkFileType(supportedFile, fileExtension)){
        console.log('success')
@@ -71,7 +71,7 @@ const createClub = async (req, res) => {
       });
     }
 
-   const response = await Club.create({ title, venue, image:cloudinaryResponse.secure_url });
+   const response = await Club.create({ title, venue, email, image:cloudinaryResponse.secure_url });
 
    if(!response){
     return res.status(500).json({
