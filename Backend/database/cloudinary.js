@@ -4,11 +4,12 @@ require('dotenv').config()
 
 const cloudinaryConfig = ()=>{
  try{
+    console.log('cloudinary hii')
     cloudinary.config({
-        API_KEY :process.env.API_KEY,
-        CLOUD_NAME : process.env.CLOUD_NAME,
-        API_SECRET : process.env.API_SECRET
-    })
+      cloud_name: process.env.cloud_name,
+      api_key:  process.env.api_key,
+      api_secret:  process.env.api_secret,
+    });
  }catch(err){
     console.log(err)
  }

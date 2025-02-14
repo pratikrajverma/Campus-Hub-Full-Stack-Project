@@ -3,8 +3,8 @@ const path = require('path')
 
 const cloudinary = require('cloudinary').v2
 
-function fileUploadToCloudinary(filePath,folder){
-  return cloudinary.uploader.upload(filePath, 
+async function fileUploadToCloudinary(filePath,folder){
+  return  await cloudinary.uploader.upload(filePath, 
     {folder,resource_type:'auto'} )
 }
 
@@ -33,10 +33,14 @@ const createClub = async (req, res) => {
     const supportedFile = ['.jpeg', '.jpg', '.png']
     const fileExtension = path.extname(image.name)
 
-    if(checkFileType(supportedFile, fileExtension)){
-      let cloudinaryResponse = await fileUploadToCloudinary(image.tempFilePath, campusHub)
-      
 
+    console.log(checkFileType(supportedFile, fileExtension))
+
+    if(checkFileType(supportedFile, fileExtension)){
+       console.log('success')
+      let cloudinaryResponse = await fileUploadToCloudinary(image.tempFilePath, 'campusHub')
+
+      console.log('cloudinary response',cloudinaryResponse) 
     }else{
       return res.status(400).json({
         success: false,
@@ -54,14 +58,15 @@ const createClub = async (req, res) => {
 
 
 
-    // const response = await Club.create({ title, venue });
+     // const response = await Club.create({ title, venue });
 
-    // res.status(200).json({
-    //   success: true,
-    //   message: "club created successfully",
-    //   data: response,
-    // });
+    res.status(200).json({
+      success: true,
+      message: "club created successfully",
+      // data: response,
+    });
   } catch (err) {
+    console.log(err)
     return res.status(500).json({
       success: false,
       message: "failed to create Club data",
