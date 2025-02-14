@@ -1,5 +1,7 @@
 const Club = require("../model/clubModel");
 const path = require('path')
+require('dotenv').config()
+const nodemailer = require('nodemailer')
 
 const cloudinary = require('cloudinary').v2
 
@@ -13,6 +15,27 @@ function checkFileType(supportedFile, fileExtension){
   return supportedFile.includes(fileExtension)
 }
 
+async function sendNotification(docs){
+
+  const  transporter = nodemailer.createTransport({
+    host:  process.env.host,
+    auth:{
+      user:  process.env.user,
+      pass: process.env.pass 
+    }
+  })
+
+
+const mailResponse = await transporter.sendMail({
+    from:  'From CampusHum official',
+    to:  docs.email,
+    html:`<h1>congratulation club created successfully</h1>`,
+    subject:`New Club created successfully`
+  })
+
+  return mailResponse;
+
+}
 
 
 const createClub = async (req, res) => {
@@ -49,6 +72,17 @@ const createClub = async (req, res) => {
     }
 
    const response = await Club.create({ title, venue, image:cloudinaryResponse.secure_url });
+
+   if(!response){
+    return res.status(500).json({
+      success: false,
+      message: "failed to created club in mongodb...",
+    });
+   }
+
+   const emailResponse = await sendNotification(response)
+   console.log('email response',emailResponse)
+
 
     res.status(200).json({
       success: true,
