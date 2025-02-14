@@ -38,7 +38,7 @@ const createClub = async (req, res) => {
 
     if(checkFileType(supportedFile, fileExtension)){
        console.log('success')
-      let cloudinaryResponse = await fileUploadToCloudinary(image.tempFilePath, 'campusHub')
+      var cloudinaryResponse = await fileUploadToCloudinary(image.tempFilePath, 'campusHub')
 
       console.log('cloudinary response',cloudinaryResponse) 
     }else{
@@ -48,22 +48,12 @@ const createClub = async (req, res) => {
       });
     }
 
-     
-
-
-
-
-
-
-
-
-
-     // const response = await Club.create({ title, venue });
+   const response = await Club.create({ title, venue, image:cloudinaryResponse.secure_url });
 
     res.status(200).json({
       success: true,
       message: "club created successfully",
-      // data: response,
+      data: response,
     });
   } catch (err) {
     console.log(err)
