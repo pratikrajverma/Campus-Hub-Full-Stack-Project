@@ -1,23 +1,66 @@
 const Club = require("../model/clubModel");
+const path = require('path')
+
+const cloudinary = require('cloudinary').v2
+
+function fileUploadToCloudinary(filePath,folder){
+  return cloudinary.uploader.upload(filePath, 
+    {folder,resource_type:'auto'} )
+}
+
+
+function checkFileType(supportedFile, fileExtension){
+  return supportedFile.includes(fileExtension)
+}
+
+
 
 const createClub = async (req, res) => {
   try {
     const { title, venue } = req.body;
 
-    if (!title || !venue) {
+    const {image} = req.files
+
+    if (!title || !venue || !image) {
       return res.status(400).json({
         success: false,
         message: "please provide all data for club creation",
       });
     }
 
-    const response = await Club.create({ title, venue });
+    console.log(image)
 
-    res.status(200).json({
-      success: true,
-      message: "club created successfully",
-      data: response,
-    });
+    const supportedFile = ['.jpeg', '.jpg', '.png']
+    const fileExtension = path.extname(image.name)
+
+    if(checkFileType(supportedFile, fileExtension)){
+      let cloudinaryResponse = await fileUploadToCloudinary(image.tempFilePath, campusHub)
+      
+
+    }else{
+      return res.status(400).json({
+        success: false,
+        message: "image file not supported...",
+      });
+    }
+
+     
+
+
+
+
+
+
+
+
+
+    // const response = await Club.create({ title, venue });
+
+    // res.status(200).json({
+    //   success: true,
+    //   message: "club created successfully",
+    //   data: response,
+    // });
   } catch (err) {
     return res.status(500).json({
       success: false,
@@ -83,15 +126,10 @@ const deleteClub = async (req, res) => {
 
 const updateClub = async (req, res) => {
   try {
-    const { clubId } = req.params;
-    // console.log(clubId)
-
-    // const { title, venue } = req.body;
+      const { clubId } = req.params;
+      let  { title, venue } = req.body;
     
-    const venue = req.body.venue
-    const title = req.body.title
-    // console.log(title, venue)
-
+      console.log(title, venue);
  
 
     if (!clubId) {
@@ -112,21 +150,17 @@ const updateClub = async (req, res) => {
       });
     }
 
-    console.log('club data',clubData)
+ 
 
-    // if (!title) {
-    //   title = clubData.title;
-    // }
+    if (!title) {
+      title = clubData.title;
+    }
 
-    // console.log('title',title)
+    if (!venue) {
+      venue = clubData[venue];
+    }
 
-    // if (!venue) {
-    //   venue = clubData[venue];
-    // }
-
-    console.log('venue',venue)
-
-    console.log('hii',title,venue)
+  
 
     const response = await Club.findByIdAndUpdate(clubId, { title, venue });
 
@@ -143,6 +177,7 @@ const updateClub = async (req, res) => {
       response
     });
   } catch (err) {
+    console.log(err)
     return res.status(500).json({
       success: false,
       message: "failed to update Club data",
